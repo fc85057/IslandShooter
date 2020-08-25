@@ -1,8 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,10 +12,12 @@ public class GameManager : MonoBehaviour
     public int skeletonsKilled = 0;
     public HealthBar healthBar;
     public ScoreIndicator scoreIndicator;
+    public GameObject gameOverMenu;
+    public GameObject mainMenu;
+    public GameObject pauseMenu;
 
     private int level = 0;
 
-    // Start is called before the first frame update
     void Awake()
     {
         if (instance == null)
@@ -31,13 +30,37 @@ public class GameManager : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
+        Time.timeScale = 0;
+    }
+
+    public void StartGame()
+    {
+        //StopCoroutine(GameOver());
+
+        ChangeHealth(maxPlayerHealth);
+        // healthBar.SetMaxHealth(maxPlayerHealth);
+        // healthBar.SetHealth(maxPlayerHealth);
+        skeletonsKilled = 0;
+        scoreIndicator.ChangeScore(0);
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        player.transform.position = new Vector3(0f, -4f, 0f);
+        player.transform.eulerAngles = new Vector3(0f, 0f, 0f);
+        player.GetComponent<PlayerController>().health = maxPlayerHealth;
+
+        player.GetComponent<Animator>().SetTrigger("isAlive");
+        player.GetComponent<Animator>().Play("PlayerIdle");
+        player.GetComponent<PlayerController>().enabled = true;
+        player.GetComponent<PlayerController>().isDead = false;
+
+        mainMenu.SetActive(false);
+        healthBar.gameObject.SetActive(true);
+        scoreIndicator.gameObject.SetActive(true);
+
+        Time.timeScale = 1f;
 
         enemySpawner = GetComponent<EnemySpawner>();
         enemySpawner.enabled = true;
-
-        healthBar.SetMaxHealth(100);
-        healthBar.SetHealth(100);
-        scoreIndicator.ChangeScore(0);
     }
 
     public void ChangeHealth(int health)
@@ -46,6 +69,8 @@ public class GameManager : MonoBehaviour
         healthBar.SetHealth(health);
         if (playerHealth <= 0)
         {
+            //StartCoroutine(GameOver());
+            //Invoke("GameOver", 2f);
             GameOver();
         }
     }
@@ -55,40 +80,35 @@ public class GameManager : MonoBehaviour
         skeletonsKilled += points;
         scoreIndicator.ChangeScore(skeletonsKilled);
     }
-
+    
     void GameOver()
     {
-        Debug.Log("Game Over.");
+        gameOverMenu.SetActive(true);
+        // Time.timeScale = 0;
+        enemySpawner.enabled = false;
     }
-
     /*
-    private void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
-    {
-        level++;
-        InitGame();
-    }
 
-    private void OnEnable()
+    IEnumerator GameOver()
     {
-        SceneManager.sceneLoaded += OnLevelFinishedLoading;
-    }
-
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnLevelFinishedLoading;
-    }
-
-    private void InitGame()
-    {
-        // update display
-        // get rid of killed enemies (call function in Enemy Spawner)
-        // spawn new level / enemies (call function in Enemy Spawner)
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        yield return new WaitForSeconds(2);
+        Time.timeScale = 0;
+        gameOverMenu.SetActive(true);
     }
     */
+    public void EndGame()
+    {
+        gameOverMenu.SetActive(false);
+        pauseMenu.SetActive(false);
+        mainMenu.SetActive(true);
+        enemySpawner.ResetSpawner();
+        enemySpawner.enabled = false;
+        healthBar.gameObject.SetActive(false);
+        scoreIndicator.gameObject.SetActive(false);
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
 }

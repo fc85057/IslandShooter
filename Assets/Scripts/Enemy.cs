@@ -37,6 +37,7 @@ public class Enemy : MonoBehaviour
         boundsCheck = GetComponent<BoxCollider2D>();
         lastposition = new Vector3(0f, 0f);
         target = GameObject.FindGameObjectWithTag("Player").transform;
+        FindObjectOfType<AudioManager>().Play("SkeletonSpawn");
     }
 
     void FixedUpdate()
@@ -166,6 +167,7 @@ public class Enemy : MonoBehaviour
     void Attack()
     {
         animator.SetTrigger("isAttacking");
+        FindObjectOfType<AudioManager>().Play("SkeletonAttack");
         Collider2D[] hits = Physics2D.OverlapCircleAll(attackPoint.position, 0.5f, playerLayer);
         foreach (Collider2D hit in hits)
         {

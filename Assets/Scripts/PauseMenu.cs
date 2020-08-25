@@ -42,7 +42,7 @@ public class PauseMenu : MonoBehaviour
 
     public void QuitGame()
     {
-        Debug.Log("Quit Game");
+        GameObject.Find("GameManager").GetComponent<GameManager>().EndGame();
     }
 
 }

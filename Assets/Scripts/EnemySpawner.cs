@@ -15,7 +15,13 @@ public class EnemySpawner : MonoBehaviour
 
     private List<GameObject> enemies;
     private float nextSpawnTime= 0f;
-    
+
+    private float initialRate;
+
+    private void Awake()
+    {
+        initialRate = startingSpawnTime;
+    }
 
     private void OnEnable()
     {
@@ -24,7 +30,7 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnEnemies()
     {
-        int numberOfEnemies = Random.Range(minSpawn, maxSpawn);
+        int numberOfEnemies = Random.Range(minSpawn, maxSpawn + 1);
         for (int i = 0; i < numberOfEnemies; i++)
         {
             Vector3 newEnemyPosition = spawnPoints[Random.Range(0, spawnPoints.Length)].position;
@@ -41,7 +47,7 @@ public class EnemySpawner : MonoBehaviour
             Debug.Log("Current time is " + Time.time + " and the next Spawn Time is " + nextSpawnTime);
             SpawnEnemies();
             nextSpawnTime = Time.time + startingSpawnTime;
-            if (startingSpawnTime > 0.5f)
+            if (startingSpawnTime > 1.5f)
             {
                 startingSpawnTime -= spawnRate;
             }
@@ -61,5 +67,19 @@ public class EnemySpawner : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void ResetSpawner()
+    {
+        if (enemies.Count > 0)
+        {
+            foreach (GameObject enemy in enemies.ToList())
+            {
+                enemy.SetActive(false);
+                enemies.Remove(enemy);
+            }
+        }
+        startingSpawnTime = initialRate;
+        nextSpawnTime = startingSpawnTime;
     }
 }

@@ -23,19 +23,16 @@ public class PlayerController : MonoBehaviour
     public GameObject smoke;
 
     private float nextAttackTime = 0f;
-    private bool isDead;
+    public bool isDead;
 
-    // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         groundCheck = GetComponent<PolygonCollider2D>();
-        GameManager.instance.playerHealth = 100;
-        GameManager.instance.skeletonsKilled = 0;
-        //isGrounded = false;
+        // GameManager.instance.playerHealth = 100;
+        // GameManager.instance.skeletonsKilled = 0;
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
 
@@ -85,17 +82,8 @@ public class PlayerController : MonoBehaviour
     {
         animator.SetTrigger("isAttacking");
         Vector3 firePoint = gunBarrel.position;
-        //firePoint.y += .3f;
         GameObject bulletTest = Instantiate(bullet, firePoint, gunBarrel.rotation);
         Debug.Log(bulletTest.name + " instantiated");
-        //if (transform.eulerAngles.y == 0)
-        //{
-        //    firePoint.x += .2f;
-        //}
-        //else
-        //{
-        //    firePoint.x += -.2f;
-        //}
         GameObject currentSmoke = Instantiate(smoke, firePoint, gunBarrel.rotation);
         yield return new WaitForSeconds(0.2f);
         Destroy(currentSmoke);
@@ -108,8 +96,7 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity = Vector2.up * jumpSpeed;
         }
-
-            
+          
     }
     
     void Die()
@@ -117,7 +104,7 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Dead");
         animator.SetTrigger("isDead");
         isDead = true;
-        this.enabled = false;
+        enabled = false;
     }
 
     public void DealDamage(int damage)
